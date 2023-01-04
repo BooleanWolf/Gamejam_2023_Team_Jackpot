@@ -1,0 +1,238 @@
+from ImageGraphics import *
+import pygame 
+from Weapon import *
+from Settings import *
+import random
+
+import pygame
+
+class Character(pygame.sprite.Sprite):
+    def __init__(self, x, y, char_type, type, ammo, grenades ,scale = 1, speed = 1):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.alive = True 
+
+        self.direction = 1
+        self.flip = False 
+
+        self.char_type = char_type
+        self.type = type
+
+        self.speed = speed
+        self.x = x
+        self.y = y
+
+        self.jump = False 
+        self.vel_y = 0
+
+        self.scale = scale
+
+        self.in_air = True 
+
+        self.shoot_cooldown = 0
+
+        self.ammo = ammo
+        self.start_ammo = ammo
+
+        self.grenades = grenades
+        self.max_grenades = grenades
+
+        self.health = 100
+        self.max_health = self.health
+     
+        self.animation_list = []
+        self.frame_index = 0 
+        temp_list = []
+        # 0 - Idle 1 - Run 2 - Attack 3 - Run and Attack 
+        self.action = 0
+
+        self.move_counter = 0
+        self.idling = False 
+        self.idling_counter = 0
+        self.vision = pygame.Rect(0, 0, 150, 20)
+
+        if self.char_type == "Player":
+            temp_list = []
+            for i in range(4):
+                img = pygame.image.load(f"./assets/Characters/{self.char_type}/{self.type}/Idle_{i}.png").convert_alpha()
+                img = transform_image(img, self.scale)
+                temp_list.append(img)
+            
+            self.animation_list.append(temp_list)
+
+            temp_list = []
+            for i in range(6):
+                img = pygame.image.load(f"./assets/Characters/{self.char_type}/{self.type}/Run_{i}.png").convert_alpha()
+                img = transform_image(img, self.scale)
+                temp_list.append(img)
+            
+            self.animation_list.append(temp_list)
+
+            temp_list = []
+            for i in range(6):
+                img = pygame.image.load(f"./assets/Characters/{self.char_type}/{self.type}/Attack_{i}.png").convert_alpha()
+                img = transform_image(img, self.scale)
+                temp_list.append(img)
+
+            self.animation_list.append(temp_list)
+
+        if self.char_type == "Enemy":
+            temp_list = []
+            for i in range(5):
+                img = pygame.image.load(f"./assets/Characters/{self.char_type}/{self.type}/Idle/{i}.png").convert_alpha()
+                img = transform_image(img, self.scale)
+                temp_list.append(img)
+            
+            self.animation_list.append(temp_list)
+
+            temp_list = []
+            for i in range(6):
+                img = pygame.image.load(f"./assets/Characters/{self.char_type}/{self.type}/Run/{i}.png").convert_alpha()
+                img = transform_image(img, self.scale)
+                temp_list.append(img)
+            
+            self.animation_list.append(temp_list)
+            
+            temp_list = []
+            for i in range(8):
+                img = pygame.image.load(f"./assets/Characters/{self.char_type}/{self.type}/Death/{i}.png").convert_alpha()
+                img = transform_image(img, self.scale)
+                temp_list.append(img)
+            
+            self.animation_list.append(temp_list)
+
+        self.update_time = pygame.time.get_ticks()
+
+        self.img = self.animation_list[self.action][self.frame_index]
+        self.rect = self.img.get_rect()
+        self.rect.center = (self.x, self.y)
+    
+    def update(self):
+        self.update_animation()
+        if self.shoot_cooldown > 0:
+            self.shoot_cooldown -= 1
+        
+        self.check_alive()
+        
+    
+    def move(self, moving_left, moving_right):
+        dx = dy = 0
+
+        if moving_left:
+            dx = -self.speed
+            self.direction = -1
+            self.flip = True 
+        if moving_right:
+            dx = self.speed
+            self.direction = 1
+            self.flip = False  
+        
+        if self.jump == True and self.in_air == False:
+            self.vel_y = -11
+            self.jump = False 
+            self.in_air = True 
+
+
+        self.vel_y += GRAVITY
+        if self.vel_y > 10:
+            self.vel_y
+        dy += self.vel_y
+
+        # Check Collision
+
+        # If player is on floor
+        if self.rect.bottom + dy > 400:
+            dy = 400 - self.rect.bottom
+            self.in_air = False 
+        
+        self.rect.x += dx
+        self.rect.y += dy
+    
+    def shoot(self, bullet_img):
+        if self.shoot_cooldown == 0 and self.ammo > 0:
+            self.shoot_cooldown = 20
+            if self.direction == 1:
+                bullet = Bullet(self.rect.centerx + (self.direction*0.75* self.rect.size[0]), self.rect.centery, self.direction, bullet_img)
+                self.ammo -= 1
+                return bullet
+            if self.direction == -1:
+                flip_bullet_img = flip_image_x(bullet_img)
+                bullet = Bullet(self.rect.centerx + (self.direction*0.75* self.rect.size[0]), self.rect.centery, self.direction, flip_bullet_img)
+                self.ammo -= 1
+                return bullet
+            
+    def ai(self, player):
+        if self.alive and player.alive:
+            if self.idling == False and random.randint(1, 50) == 5:
+                self.idling= True
+                self.idling_counter = 50
+                self.update_action(0)
+            
+            if self.vision.colliderect(player.rect):
+                self.update_action(0)
+                return self.shoot(bullet_img)
+                
+
+
+
+            if self.idling == False:
+                ai_moving_right = False 
+                if self.direction == 1:
+                    ai_moving_right = True 
+                else:
+                    ai_moving_right = False 
+                
+                ai_moving_left = not ai_moving_right
+                self.move(ai_moving_left, ai_moving_right)
+                self.update_action(1)
+                self.move_counter += 1
+
+                self.vision.center = (self.rect.centerx + 75 * self.direction, self.rect.centery)
+               
+
+                if self.move_counter > TILE_SIZE:
+                    self.direction *= -1
+                    self.move_counter *= -1
+            else:
+                self.idling_counter -= 1
+                if self.idling_counter <= 0:
+                    self.idling = False 
+
+
+
+    def update_animation(self):
+        ANIMATION_COOLDOWN = 150
+
+        self.img = self.animation_list[self.action][self.frame_index]
+
+        if pygame.time.get_ticks() - self.update_time > ANIMATION_COOLDOWN:
+            self.update_time = pygame.time.get_ticks()
+            self.frame_index += 1
+        
+        if self.frame_index >= len(self.animation_list[self.action]):
+            if not (self.char_type == "Enemy" and self.action == 2):
+                self.frame_index = 0 
+            else:
+                self.frame_index = len(self.animation_list[self.action]) - 1
+
+    def update_action(self, new_action):
+        if new_action != self.action:
+            self.action = new_action
+            self.frame_index = 0
+            self.update_time = pygame.time.get_ticks()
+
+
+    def check_alive(self):
+        if self.health <=0:
+            self.health = 0
+            self.speed = 0
+            self.alive = False 
+            self.update_action(2)
+        
+        return self.alive
+    
+  
+
+    def draw(self, screen):
+        img = pygame.transform.flip(self.img, self.flip, False)
+        screen.blit(img, self.rect)
