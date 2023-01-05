@@ -51,6 +51,9 @@ class Character(pygame.sprite.Sprite):
         self.idling_counter = 0
         self.vision = pygame.Rect(0, 0, 150, 20)
 
+        # Glitch
+        self.down_jump = False 
+
         if self.char_type == "Player":
             temp_list = []
             for i in range(4):
@@ -119,28 +122,50 @@ class Character(pygame.sprite.Sprite):
         self.check_alive()
         
     
-    def move(self, moving_left, moving_right, world, bg_scroll, water_group, exit_group):
+    def move(self, moving_left, moving_right, world, bg_scroll, water_group, exit_group, control_glitch, gravity_glitch):
         dx = dy = 0
         SCREEN_SCROLL = 0
-        if moving_left:
-            dx = -self.speed
-            self.direction = -1
-            self.flip = True 
-        if moving_right:
-            dx = self.speed
-            self.direction = 1
-            self.flip = False  
+
+        if control_glitch and self.char_type == "Player":
+            if moving_right:
+                dx = -self.speed
+                self.direction = -1
+                self.flip = True 
+            if moving_left:
+                dx = self.speed
+                self.direction = 1
+                self.flip = False  
+        else:
+            if moving_left:
+                dx = -self.speed
+                self.direction = -1
+                self.flip = True 
+            if moving_right:
+                dx = self.speed
+                self.direction = 1
+                self.flip = False  
         
+        # GRAVITY = 0.2
         if self.jump == True and self.in_air == False:
-            self.vel_y = -15
+            self.vel_y = -14
             self.jump = False 
             self.in_air = True 
+        
+        if self.down_jump == True:
+            self.vel_y = 12
+            self.down_jump = False 
 
-
-        self.vel_y += GRAVITY
-        if self.vel_y > 10:
-            self.vel_y
-        dy += self.vel_y
+        if self.char_type == "Player" and gravity_glitch:
+            gravity = 0.2 
+            self.vel_y += -gravity
+            if self.vel_y > 10:
+                self.vel_y
+            dy += self.vel_y
+        else:
+            self.vel_y += GRAVITY
+            if self.vel_y > 10:
+                self.vel_y
+            dy += self.vel_y
 
         # Check Collision
         for tile in world.obstacle_list:
@@ -185,6 +210,10 @@ class Character(pygame.sprite.Sprite):
         if self.char_type == "Player":
             if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
                 dx = 0
+            
+            if self.rect.top + dy <= 0:
+                dy = 0
+                self.alive = False 
 
         
         self.rect.x += dx
@@ -197,20 +226,32 @@ class Character(pygame.sprite.Sprite):
 
         return SCREEN_SCROLL, level_complete
     
-    def shoot(self, bullet_img):
+    def shoot(self, bullet_img, direction_glitch):
         if self.shoot_cooldown == 0 and self.ammo > 0:
             self.shoot_cooldown = 20
-            if self.direction == 1:
-                bullet = Bullet(self.rect.centerx + (self.direction*0.75* self.rect.size[0]), self.rect.centery, self.direction, bullet_img)
-                self.ammo -= 1
-                return bullet
-            if self.direction == -1:
-                flip_bullet_img = flip_image_x(bullet_img)
-                bullet = Bullet(self.rect.centerx + (self.direction*0.75* self.rect.size[0]), self.rect.centery, self.direction, flip_bullet_img)
-                self.ammo -= 1
-                return bullet
             
-    def ai(self, player, world, SCREEN_SCROLL, bg_scroll, water_group, exit_group):
+            if self.char_type == "Player" and direction_glitch:
+                if self.direction == 1:
+                    flip_bullet_img = flip_image_x(bullet_img)
+                    bullet = Bullet(self.rect.centerx + (-self.direction*0.75* self.rect.size[0]), self.rect.centery, self.direction, flip_bullet_img, -1)
+                    self.ammo -= 1
+                    return bullet
+                if self.direction == -1:
+                    bullet = Bullet(self.rect.centerx + (-self.direction*0.75* self.rect.size[0]), self.rect.centery, self.direction, bullet_img, -1)
+                    self.ammo -= 1
+                    return bullet
+            else:
+                if self.direction == 1:
+                    bullet = Bullet(self.rect.centerx + (self.direction*0.75* self.rect.size[0]), self.rect.centery, self.direction, bullet_img, 1)
+                    self.ammo -= 1
+                    return bullet
+                if self.direction == -1:
+                    flip_bullet_img = flip_image_x(bullet_img)
+                    bullet = Bullet(self.rect.centerx + (self.direction*0.75* self.rect.size[0]), self.rect.centery, self.direction, flip_bullet_img, 1)
+                    self.ammo -= 1
+                    return bullet
+            
+    def ai(self, player, world, SCREEN_SCROLL, bg_scroll, water_group, exit_group, control_glitch, direction_glitch,  gravity_glitch):
         if self.alive and player.alive:
             if self.idling == False and random.randint(1, 50) == 5:
                 self.idling= True
@@ -219,7 +260,7 @@ class Character(pygame.sprite.Sprite):
             
             if self.vision.colliderect(player.rect):
                 self.update_action(0)
-                return self.shoot(bullet_img)
+                return self.shoot(bullet_img, direction_glitch)
                 
 
 
@@ -232,7 +273,7 @@ class Character(pygame.sprite.Sprite):
                     ai_moving_right = False 
                 
                 ai_moving_left = not ai_moving_right
-                self.move(ai_moving_left, ai_moving_right, world, bg_scroll, water_group, exit_group)
+                self.move(ai_moving_left, ai_moving_right, world, bg_scroll, water_group, exit_group, control_glitch,  gravity_glitch)
                 self.update_action(1)
                 self.move_counter += 1
 

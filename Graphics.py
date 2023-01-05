@@ -42,9 +42,9 @@ class HealthBar:
     
     def draw_enemy(self, health, screen, enemy):
         self.health = health 
-        pygame.draw.rect(screen, BLACK, (enemy.rect.centerx, enemy.rect.centery - 30, 34, 14))
-        pygame.draw.rect(screen, RED, (enemy.rect.centerx, enemy.rect.centery - 30, 30, 10))
-        pygame.draw.rect(screen, GREEN, (enemy.rect.centerx, enemy.rect.centery - 30, 30 * (self.health/self.max_health), 20))
+        pygame.draw.rect(screen, BLACK, (enemy.rect.centerx - 20, enemy.rect.centery - 30, 44, 8))
+        pygame.draw.rect(screen, RED, (enemy.rect.centerx - 18, enemy.rect.centery - 28, 40, 4))
+        pygame.draw.rect(screen, GREEN, (enemy.rect.centerx - 18, enemy.rect.centery - 28, 40 * (self.health/self.max_health), 4))
 
 class Button():
 	def __init__(self,x, y, image, scale):

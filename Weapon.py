@@ -7,16 +7,18 @@ EXPLOSION_GROUP = pygame.sprite.Group()
 
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y, direction, image):
+    def __init__(self, x, y, direction, image, not_glitch):
         pygame.sprite.Sprite.__init__(self)
         self.speed = 10
         self.image = image 
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.direction = direction
+        self.not_glitch = not_glitch
     
     def update(self, player, enemy_group, bullet_group, world, SCREEN_SCROLL):
-        self.rect.x += (self.direction * self.speed) + SCREEN_SCROLL
+      
+        self.rect.x += (self.not_glitch * self.direction * self.speed) + SCREEN_SCROLL
 
         if self.rect.right < 0 or self.rect.left > SCREEN_WIDTH:
             self.kill()
@@ -54,9 +56,14 @@ class Grenade(pygame.sprite.Sprite):
         self.width = self.image.get_width()
         self.height = self.image.get_height()
     
-    def update(self, player, enemy_group, world,SCREEN_SCROLL):
+    def update(self, player, enemy_group, world,SCREEN_SCROLL, direction_glitch):
         self.velocity_y += GRAVITY
-        dx = self.direction * self.speed
+
+        if direction_glitch:
+            dx = -self.direction * self.speed
+        else:
+            dx = self.direction * self.speed
+
         dy = self.velocity_y
 
         for tile in world.obstacle_list:

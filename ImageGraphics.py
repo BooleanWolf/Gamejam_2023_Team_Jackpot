@@ -44,3 +44,5 @@ homeScreen_img = pygame.transform.scale(homeScreen_img, (SCREEN_WIDTH, SCREEN_HE
 playButton_img = pygame.image.load('./assets/Buttons/play_button.png').convert_alpha()
 exitbtn_img = pygame.image.load('./assets/Buttons/exit_btn.png').convert_alpha()
 restartbtn_img = pygame.image.load('./assets/Buttons/restart_btn.png').convert_alpha()
+
+control_glitch_btn_img=  pygame.image.load('./assets/Buttons/control_glitch_btn.png').convert_alpha()

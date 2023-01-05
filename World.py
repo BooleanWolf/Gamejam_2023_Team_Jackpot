@@ -49,7 +49,7 @@ class World:
                         decoration = Decoration(img, x * TILE_SIZE, y * TILE_SIZE)
                         DECORATION_GROUP.add(decoration)
                     elif tile == 15:
-                        player = Character(x = x * TILE_SIZE, y = y * TILE_SIZE, char_type="Player",type = PLAYER_TYPE, scale= 0.2,speed= 5, ammo=5, grenades=5)
+                        player = Character(x = x * TILE_SIZE, y = y * TILE_SIZE, char_type="Player",type = PLAYER_TYPE, scale= 0.2,speed= 5, ammo=5, grenades=10)
                         healthbar = HealthBar(10, 10, player.health, player.max_health)
                     elif tile == 16:
                         enemy = Character(x = x * TILE_SIZE, y = y * TILE_SIZE, char_type="Enemy", type="CuteBorg", scale=0.25, speed=3, ammo=5, grenades=0)

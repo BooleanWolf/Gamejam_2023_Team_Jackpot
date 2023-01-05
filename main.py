@@ -10,7 +10,7 @@ from Items import *
 from World import *
 from Instances import *
 from Scene import *
-
+import random
 
 pygame.init()
 
@@ -91,6 +91,28 @@ scene = Scene(screen)
 print(enemy_group)
 print(item_box_group)
 
+
+################################################### GLITCH ############################################################
+# Player Option Glitch
+wall_bang_glitch = False 
+teleport_glitch = False 
+
+# Timer Glitch
+
+
+GLITCH_LIST = {
+    'No Glitch' : False,
+    'control_glitch': False, 
+    'direction_glitch': False, 
+    'gravity_glitch': False 
+}
+
+glitch_happening = "No Glitch"
+glitch_counter = 0
+
+######### LEVEL TIMER #################################################
+GLITCH_CLOCK = 360
+
 run = True 
 while run:
     # Settings
@@ -135,7 +157,7 @@ while run:
         #Enemy
         for enemy in enemy_group:
             healthbar.draw_enemy(enemy.health, screen, enemy)
-            bullet = enemy.ai(player, world, SCREEN_SCROLL, BG_SCROLL, water_group, exit_group)
+            bullet = enemy.ai(player, world, SCREEN_SCROLL, BG_SCROLL, water_group, exit_group, GLITCH_LIST['control_glitch'], GLITCH_LIST['direction_glitch'], GLITCH_LIST['gravity_glitch'])
             if bullet:
                 bullet_group.add(bullet)
             enemy.draw(screen)
@@ -153,7 +175,7 @@ while run:
 
         #Grenade
         
-        grenade_group.update(player, enemy_group, world, SCREEN_SCROLL)
+        grenade_group.update(player, enemy_group, world, SCREEN_SCROLL, GLITCH_LIST['direction_glitch'])
         grenade_group.draw(screen)
         
 
@@ -162,13 +184,39 @@ while run:
         explosion_group.update(SCREEN_SCROLL)
         explosion_group.draw(screen)
 
+        ### Glitch
+        glitch_action = scene.ingame_ui(GLITCH_CLOCK // FPS, glitch_happening)
+
+        ########################## GLITCH VALUES ####################################
+        glitch_types = list(GLITCH_LIST.keys())
+    
+        #################### CONTROLLING GLITCH ########################################
+
+        if GLITCH_CLOCK == 0:
+            GLITCH_LIST = {
+                'control_glitch': False, 
+                'direction_glitch': False, 
+                'gravity_glitch': False 
+            }
+            glitch_happening = glitch_types[glitch_counter]
+            GLITCH_LIST[glitch_happening] = True 
+            glitch_counter += 1
+            if glitch_counter >= len(glitch_types):
+                glitch_counter = 0
+        if GLITCH_CLOCK <= 0:
+            GLITCH_CLOCK = random.randint(6, 16)*FPS #TASK: eta ke random korte hobe 
+        GLITCH_CLOCK -= 1
+
+        ################# GLITCH BUTTON ##############################################
+
         
+         
 
         # Shooring anmd moving 
         if player.alive:
 
             if shoot:
-                bullet = player.shoot(bullet_img)
+                bullet = player.shoot(bullet_img, GLITCH_LIST['direction_glitch'])
                 if bullet:
                     bullet_group.add(bullet)
             elif grenade and grenade_thrown == False and player.grenades > 0:
@@ -183,7 +231,7 @@ while run:
             else:
                 player.update_action(0)
 
-            SCREEN_SCROLL, level_complete = player.move(moving_left, moving_right, world, BG_SCROLL, water_group, exit_group)
+            SCREEN_SCROLL, level_complete = player.move(moving_left, moving_right, world, BG_SCROLL, water_group, exit_group, GLITCH_LIST['control_glitch'], GLITCH_LIST['gravity_glitch'])
             BG_SCROLL -= SCREEN_SCROLL
 
             if level_complete:
@@ -198,6 +246,20 @@ while run:
                                 world_data[x][y] = int(tile)
                         world = World()
                         player, healthbar = world.process_delta(world_data)
+                wall_bang_glitch = False 
+                wet_glitch = False 
+                teleport_glitch = False 
+                GLITCH_CLOCK = 360
+
+                # Timer Glitch
+                GLITCH_LIST = {
+                    'control_glitch': False, 
+                    'direction_glitch': False, 
+                    'gravity_glitch': False 
+                }
+                glitch_happening = "No Glitch"
+                glitch_counter = 0
+                
 
         else:
             action = scene.restart_screen()
@@ -212,6 +274,20 @@ while run:
                             world_data[x][y] = int(tile)
                 world = World()
                 player, healthbar = world.process_delta(world_data)
+                # Player Option Glitch
+                wall_bang_glitch = False 
+                wet_glitch = False 
+                teleport_glitch = False 
+                GLITCH_CLOCK = 360
+
+                # Timer Glitch
+                GLITCH_LIST = {
+                    'control_glitch': False, 
+                    'direction_glitch': False, 
+                    'gravity_glitch': False 
+                }
+                glitch_happening = "No Glitch"
+                glitch_counter = 0
                             
 
     #Events
@@ -231,6 +307,9 @@ while run:
                 grenade = True 
             if event.key == pygame.K_w and player.alive:
                 player.jump = True 
+
+            if event.key == pygame.K_s and player.alive and GLITCH_LIST['gravity_glitch']:
+                player.down_jump = True 
 
             
 
