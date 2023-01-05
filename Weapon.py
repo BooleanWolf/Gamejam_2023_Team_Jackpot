@@ -15,11 +15,18 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.direction = direction
     
-    def update(self, player, enemy_group, bullet_group):
-        self.rect.x += (self.direction * self.speed) 
+    def update(self, player, enemy_group, bullet_group, world, SCREEN_SCROLL):
+        self.rect.x += (self.direction * self.speed) + SCREEN_SCROLL
 
         if self.rect.right < 0 or self.rect.left > SCREEN_WIDTH:
             self.kill()
+        
+        # Glitch 2 : Wall Bang - Bullets will go through the wall (Remove the next three lines)
+
+        for tile in world.obstacle_list:
+            if tile[1].colliderect(self.rect):
+                self.kill()
+
         
         if pygame.sprite.spritecollide(player, bullet_group, False):
             if player.alive:
@@ -44,21 +51,31 @@ class Grenade(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.direction = direction
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
     
-    def update(self, player, enemy_group):
+    def update(self, player, enemy_group, world,SCREEN_SCROLL):
         self.velocity_y += GRAVITY
         dx = self.direction * self.speed
         dy = self.velocity_y
 
-        if self.rect.bottom + dy > 400:
-            dy = 400 - self.rect.bottom 
-            dx = 0
-        
-        if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
-            self.direction *= -1
-            dx = self.direction * self.speed
+        for tile in world.obstacle_list:
+            if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
+                self.direction *= -1
+                dx = self.direction * self.speed
+            
+            if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+                self.speed = 0
+                if self.velocity_y < 0:
+                    self.velocity_y = 0
+                    dy = tile[1].bottom - self.rect.top 
+                elif self.velocity_y >= 0:
+                    self.velocity_y = 0
+                    dy = tile[1].top - self.rect.bottom 
 
-        self.rect.x += dx 
+       
+
+        self.rect.x += dx  + SCREEN_SCROLL
         self.rect.y += dy
 
         self.timer  -= 1

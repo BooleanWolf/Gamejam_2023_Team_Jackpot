@@ -33,3 +33,14 @@ for i in range(TILE_TYPES):
     img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
     TILES_IMG_LIST.append(img)
 
+####### Background Image ###########
+bg_image = pygame.image.load('./assets/Background/wallpaper.jpg')
+bg_image = pygame.transform.scale(bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+bg_image.set_alpha(128)
+
+homeScreen_img = pygame.image.load('./assets/HomeScreen/HomeScreen.png')
+homeScreen_img = pygame.transform.scale(homeScreen_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+playButton_img = pygame.image.load('./assets/Buttons/play_button.png').convert_alpha()
+exitbtn_img = pygame.image.load('./assets/Buttons/exit_btn.png').convert_alpha()
+restartbtn_img = pygame.image.load('./assets/Buttons/restart_btn.png').convert_alpha()

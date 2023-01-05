@@ -106,6 +106,10 @@ class Character(pygame.sprite.Sprite):
         self.img = self.animation_list[self.action][self.frame_index]
         self.rect = self.img.get_rect()
         self.rect.center = (self.x, self.y)
+
+        self.width = self.img.get_width()
+        self.height = self.img.get_height()
+
     
     def update(self):
         self.update_animation()
@@ -115,9 +119,9 @@ class Character(pygame.sprite.Sprite):
         self.check_alive()
         
     
-    def move(self, moving_left, moving_right):
+    def move(self, moving_left, moving_right, world, bg_scroll, water_group, exit_group):
         dx = dy = 0
-
+        SCREEN_SCROLL = 0
         if moving_left:
             dx = -self.speed
             self.direction = -1
@@ -128,7 +132,7 @@ class Character(pygame.sprite.Sprite):
             self.flip = False  
         
         if self.jump == True and self.in_air == False:
-            self.vel_y = -11
+            self.vel_y = -15
             self.jump = False 
             self.in_air = True 
 
@@ -139,14 +143,59 @@ class Character(pygame.sprite.Sprite):
         dy += self.vel_y
 
         # Check Collision
+        for tile in world.obstacle_list:
+            if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
+                dx = 0
 
-        # If player is on floor
-        if self.rect.bottom + dy > 400:
-            dy = 400 - self.rect.bottom
-            self.in_air = False 
+                if self.char_type == 'Enemy':
+                    self.direction += -1
+                    self.move_counter = 0
+            if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+                if self.vel_y < 0:
+                    self.vel_y = 0
+                    dy = tile[1].bottom - self.rect.top 
+                elif self.vel_y >= 0:
+                    self.vel_y = 0
+                    self.in_air = False 
+                    dy = tile[1].top - self.rect.bottom 
+                
+                # Glitch 1 : "Player will teleport to the above bar"
+
+                # if self.vel_y < 0:
+                #     self.vel_y = 0
+                #     dy = tile[1].bottom - self.rect.top 
+                # if self.vel_y >= 0:
+                #     self.vel_y = 0
+                #     self.in_air = False 
+                #     dy = tile[1].top - self.rect.bottom 
+
+        if pygame.sprite.spritecollide(self, water_group, False):
+            self.health = 0
+        
+        level_complete = False 
+        if pygame.sprite.spritecollide(self, exit_group, False):
+            level_complete = True 
+
+
+        if self.rect.bottom > SCREEN_HEIGHT:
+            self.health = 0
+
+
+
+        if self.char_type == "Player":
+            if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
+                dx = 0
+
         
         self.rect.x += dx
         self.rect.y += dy
+
+        if self.char_type == "Player":
+            if( self.rect.right > SCREEN_WIDTH - SCROLL_THRESH and bg_scroll < (world.level_length * TILE_SIZE) - SCREEN_WIDTH) or( self.rect.left < SCROLL_THRESH and bg_scroll > abs(dx)):
+                self.rect.x -= dx
+                SCREEN_SCROLL = -dx 
+
+        return SCREEN_SCROLL, level_complete
     
     def shoot(self, bullet_img):
         if self.shoot_cooldown == 0 and self.ammo > 0:
@@ -161,7 +210,7 @@ class Character(pygame.sprite.Sprite):
                 self.ammo -= 1
                 return bullet
             
-    def ai(self, player):
+    def ai(self, player, world, SCREEN_SCROLL, bg_scroll, water_group, exit_group):
         if self.alive and player.alive:
             if self.idling == False and random.randint(1, 50) == 5:
                 self.idling= True
@@ -183,7 +232,7 @@ class Character(pygame.sprite.Sprite):
                     ai_moving_right = False 
                 
                 ai_moving_left = not ai_moving_right
-                self.move(ai_moving_left, ai_moving_right)
+                self.move(ai_moving_left, ai_moving_right, world, bg_scroll, water_group, exit_group)
                 self.update_action(1)
                 self.move_counter += 1
 
@@ -197,6 +246,8 @@ class Character(pygame.sprite.Sprite):
                 self.idling_counter -= 1
                 if self.idling_counter <= 0:
                     self.idling = False 
+        
+        self.rect.x += SCREEN_SCROLL
 
 
 

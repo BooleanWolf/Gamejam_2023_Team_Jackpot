@@ -1,6 +1,8 @@
 import json
 
 
+MAX_LEVELS = 3
+
 ############################################################# Character ###################################################\
 with open("local_variable.json", "r") as openfile:
     json_obj = json.load(openfile)
@@ -11,13 +13,15 @@ ENEMY_TYPE = "EnemyBorg"
 
 
 ############################################################## Display ####################################################
-SCREEN_WIDTH = 1600
+SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 800
 FPS = 60
 
+SCROLL_THRESH = 200
+
 ROWS = 16
 COLS = 150
-LEVEL = 1
+LEVEL = 0
 TILE_SIZE = SCREEN_HEIGHT // ROWS
 TILE_TYPES = 21
 

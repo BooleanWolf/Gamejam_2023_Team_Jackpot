@@ -1,6 +1,8 @@
 import pygame
+from ImageGraphics import *
 
-SCREEN_WIDTH = 1600
+
+SCREEN_WIDTH = 1200
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
@@ -16,7 +18,13 @@ class Background:
 
     def draw_simple_bg(self):
         self.screen.fill(self.colour)
-        pygame.draw.line(self.screen, RED, (0, 400), (SCREEN_WIDTH, 400))
+    
+    def draw_img_bg(self, bg_img, bg_scroll):
+        self.screen.fill(self.colour)
+        width = bg_img.get_width()
+        for i in range(9):
+            self.screen.blit(bg_img, (width * i - bg_scroll, 0))
+       
 
     
 class HealthBar:
@@ -31,3 +39,35 @@ class HealthBar:
         pygame.draw.rect(screen, BLACK, (self.x - 2, self.y - 2, 154, 24))
         pygame.draw.rect(screen, RED, (self.x, self.y, 150, 20))
         pygame.draw.rect(screen, GREEN, (self.x, self.y, 150 * (self.health/self.max_health), 20))
+    
+    def draw_enemy(self, health, screen, enemy):
+        self.health = health 
+        pygame.draw.rect(screen, BLACK, (enemy.rect.centerx, enemy.rect.centery - 30, 34, 14))
+        pygame.draw.rect(screen, RED, (enemy.rect.centerx, enemy.rect.centery - 30, 30, 10))
+        pygame.draw.rect(screen, GREEN, (enemy.rect.centerx, enemy.rect.centery - 30, 30 * (self.health/self.max_health), 20))
+
+class Button():
+	def __init__(self,x, y, image, scale):
+		width = image.get_width()
+		height = image.get_height()
+		self.image = transform_image(image, scale)
+		self.rect = self.image.get_rect()
+		self.rect.topleft = (x, y)
+		self.clicked = False
+
+	def draw(self, surface):
+		action = False
+
+		pos = pygame.mouse.get_pos()
+
+		if self.rect.collidepoint(pos):
+			if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+				action = True
+				self.clicked = True
+
+		if pygame.mouse.get_pressed()[0] == 0:
+			self.clicked = False
+
+		surface.blit(self.image, (self.rect.x, self.rect.y))
+
+		return action

@@ -28,6 +28,10 @@ class World:
         self.obstacle_list = []
 
     def process_delta(self, data):
+
+
+        self.level_length = len(data[0])
+
         for y, row in enumerate(data):
             for x, tile in enumerate(row):
                 if tile >= 0:
@@ -45,10 +49,10 @@ class World:
                         decoration = Decoration(img, x * TILE_SIZE, y * TILE_SIZE)
                         DECORATION_GROUP.add(decoration)
                     elif tile == 15:
-                        player = Character(x = x * TILE_SIZE, y = y * TILE_SIZE, char_type="Player",type = PLAYER_TYPE, scale= 0.3,speed= 5, ammo=5, grenades=5)
+                        player = Character(x = x * TILE_SIZE, y = y * TILE_SIZE, char_type="Player",type = PLAYER_TYPE, scale= 0.2,speed= 5, ammo=5, grenades=5)
                         healthbar = HealthBar(10, 10, player.health, player.max_health)
                     elif tile == 16:
-                        enemy = Character(x = x * TILE_SIZE, y = y * TILE_SIZE, char_type="Enemy", type=ENEMY_TYPE, scale=2, speed=3, ammo=5, grenades=0)
+                        enemy = Character(x = x * TILE_SIZE, y = y * TILE_SIZE, char_type="Enemy", type="CuteBorg", scale=0.25, speed=3, ammo=5, grenades=0)
                         ENEMY_GROUP.add(enemy)
                     elif tile == 17:
                         item_box = ItemBox(x * TILE_SIZE, y * TILE_SIZE, 'AMMO')
@@ -64,8 +68,9 @@ class World:
                         EXIT_GROUP.add(exit)
         return player, healthbar
     
-    def draw(self):
+    def draw(self, SCREEN_SCROLL):
         for tile in self.obstacle_list:
+            tile[1][0] += SCREEN_SCROLL 
             screen.blit(tile[0], tile[1])
 
 
@@ -75,6 +80,9 @@ class Decoration(pygame.sprite.Sprite):
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.midtop = (x + TILE_SIZE // 2, y+ (TILE_SIZE - self.image.get_height()))
+    
+    def update(self, SCREEN_SCROLL):
+        self.rect.x += SCREEN_SCROLL
 
 class Water(pygame.sprite.Sprite):
     def __init__(self, image, x, y):
@@ -82,6 +90,9 @@ class Water(pygame.sprite.Sprite):
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.midtop = (x + TILE_SIZE // 2, y+ (TILE_SIZE - self.image.get_height()))
+    
+    def update(self, SCREEN_SCROLL):
+        self.rect.x += SCREEN_SCROLL
 
 class Exit(pygame.sprite.Sprite):
     def __init__(self, image, x, y):
@@ -89,3 +100,6 @@ class Exit(pygame.sprite.Sprite):
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.midtop = (x + TILE_SIZE // 2, y+ (TILE_SIZE - self.image.get_height()))
+
+    def update(self, SCREEN_SCROLL):
+        self.rect.x += SCREEN_SCROLL

@@ -16,7 +16,9 @@ class ItemBox(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.midtop = (x + TILE_SIZE//2, y + (TILE_SIZE - self.image.get_height()))
     
-    def update(self, player):
+    def update(self, player, SCREEN_SCROLL):
+
+        self.rect.x += SCREEN_SCROLL
         if pygame.sprite.collide_rect(self, player):
             if self.item_type == "HEALTH":
                 player.health += 25

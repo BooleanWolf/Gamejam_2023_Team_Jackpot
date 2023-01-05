@@ -18,7 +18,8 @@ class Explosion(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.counter = 0
 
-    def update(self):
+    def update(self, SCREEN_SCROLL):
+        self.rect.x += SCREEN_SCROLL 
         EXPLOSION_SPEED = 6
 
         self.counter += 1
