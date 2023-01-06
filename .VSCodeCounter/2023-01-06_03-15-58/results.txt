@@ -1,0 +1,43 @@
+Date : 2023-01-06 03:15:58
+Directory : f:\Game 2D\GameJam2023
+Total : 15 files,  998 codes, 95 comments, 344 blanks, all 1437 lines
+
+Languages
++------------------+------------+------------+------------+------------+------------+
+| language         | files      | code       | comment    | blank      | total      |
++------------------+------------+------------+------------+------------+------------+
+| Python           |         13 |        989 |         95 |        343 |      1,427 |
+| pip requirements |          1 |          5 |          0 |          1 |          6 |
+| JSON             |          1 |          4 |          0 |          0 |          4 |
++------------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                   | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                      |         15 |        998 |         95 |        344 |      1,437 |
+| . (Files)                                              |         13 |        824 |         53 |        290 |      1,167 |
+| LevelEditor                                            |          2 |        174 |         42 |         54 |        270 |
++--------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------+------------------+------------+------------+------------+------------+
+| filename                                               | language         | code       | comment    | blank      | total      |
++--------------------------------------------------------+------------------+------------+------------+------------+------------+
+| f:\Game 2D\GameJam2023\Animation.py                    | Python           |         28 |          0 |         12 |         40 |
+| f:\Game 2D\GameJam2023\Character.py                    | Python           |        236 |         12 |         83 |        331 |
+| f:\Game 2D\GameJam2023\Graphics.py                     | Python           |         54 |          0 |         18 |         72 |
+| f:\Game 2D\GameJam2023\ImageGraphics.py                | Python           |         30 |          3 |         15 |         48 |
+| f:\Game 2D\GameJam2023\Instances.py                    | Python           |          2 |          0 |          0 |          2 |
+| f:\Game 2D\GameJam2023\Items.py                        | Python           |         28 |          0 |         10 |         38 |
+| f:\Game 2D\GameJam2023\LevelEditor\button.py           | Python           |         20 |          4 |          7 |         31 |
+| f:\Game 2D\GameJam2023\LevelEditor\level_editor_tut.py | Python           |        154 |         38 |         47 |        239 |
+| f:\Game 2D\GameJam2023\Scene.py                        | Python           |         32 |          0 |         12 |         44 |
+| f:\Game 2D\GameJam2023\Settings.py                     | Python           |         18 |          4 |         12 |         34 |
+| f:\Game 2D\GameJam2023\Weapon.py                       | Python           |         77 |          1 |         31 |        109 |
+| f:\Game 2D\GameJam2023\World.py                        | Python           |         89 |          0 |         16 |        105 |
+| f:\Game 2D\GameJam2023\local_variable.json             | JSON             |          4 |          0 |          0 |          4 |
+| f:\Game 2D\GameJam2023\main.py                         | Python           |        221 |         33 |         80 |        334 |
+| f:\Game 2D\GameJam2023\requirements.txt                | pip requirements |          5 |          0 |          1 |          6 |
+| Total                                                  |                  |        998 |         95 |        344 |      1,437 |
++--------------------------------------------------------+------------------+------------+------------+------------+------------+

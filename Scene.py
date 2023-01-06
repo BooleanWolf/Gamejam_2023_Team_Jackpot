@@ -29,14 +29,26 @@ class Scene:
         if restart_btn.draw(self.screen):
             return 1
     
-    def ingame_ui(self, glitch_timer, which_glitch):
+    def ingame_ui(self, glitch_timer, which_glitch, next_glitch):
         glitch_timer_text = self.draw_text(f"GLITCH: {glitch_timer}", 750, 40, 30)
         self.screen.blit(glitch_timer_text[0], glitch_timer_text[1])
 
         which_glitch_text = self.draw_text(f"{which_glitch}", 950, 40, 30)
         self.screen.blit(which_glitch_text[0], which_glitch_text[1])
-        if controlGlitch_btn.draw(self.screen):
-            return 1
+
+        next_glitch_text = self.draw_text(f"Next Glitch: {next_glitch}", 950, 70, 30)
+        self.screen.blit(next_glitch_text[0], next_glitch_text[1])
+    
+    def ingame_ui_for_custom(self, custom_glitch, custom_glitch_timer, tp, wb):
+        custom_glitch_txt = self.draw_text(f"Active Glitch: {custom_glitch} Time: {custom_glitch_timer}", 950, 100, 30)
+        self.screen.blit(custom_glitch_txt[0], custom_glitch_txt[1])
+        # if not tp:
+        #     if controlGlitch_btn.draw(self.screen):
+        #         return 1
+        if not wb:
+            if controlGlitch_btn.draw(self.screen):
+                return 2
+       
         
         
         

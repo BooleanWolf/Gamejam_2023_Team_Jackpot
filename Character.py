@@ -122,7 +122,7 @@ class Character(pygame.sprite.Sprite):
         self.check_alive()
         
     
-    def move(self, moving_left, moving_right, world, bg_scroll, water_group, exit_group, control_glitch, gravity_glitch):
+    def move(self, moving_left, moving_right, world, bg_scroll, water_group, exit_group, control_glitch, gravity_glitch, teleport_glitch):
         dx = dy = 0
         SCREEN_SCROLL = 0
 
@@ -147,7 +147,7 @@ class Character(pygame.sprite.Sprite):
         
         # GRAVITY = 0.2
         if self.jump == True and self.in_air == False:
-            self.vel_y = -14
+            self.vel_y = -15
             self.jump = False 
             self.in_air = True 
         
@@ -176,23 +176,23 @@ class Character(pygame.sprite.Sprite):
                     self.direction += -1
                     self.move_counter = 0
             if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
-                if self.vel_y < 0:
-                    self.vel_y = 0
-                    dy = tile[1].bottom - self.rect.top 
-                elif self.vel_y >= 0:
-                    self.vel_y = 0
-                    self.in_air = False 
-                    dy = tile[1].top - self.rect.bottom 
-                
-                # Glitch 1 : "Player will teleport to the above bar"
-
-                # if self.vel_y < 0:
-                #     self.vel_y = 0
-                #     dy = tile[1].bottom - self.rect.top 
-                # if self.vel_y >= 0:
-                #     self.vel_y = 0
-                #     self.in_air = False 
-                #     dy = tile[1].top - self.rect.bottom 
+                if not teleport_glitch:
+                    if self.vel_y < 0:
+                        self.vel_y = 0
+                        dy = tile[1].bottom - self.rect.top 
+                    elif self.vel_y >= 0:
+                        self.vel_y = 0
+                        self.in_air = False 
+                        dy = tile[1].top - self.rect.bottom 
+                else:
+                # Glitch 1 : "Player will teleport to the above bar"                
+                    if self.vel_y < 0:
+                        self.vel_y = 0
+                        dy = tile[1].bottom - self.rect.top 
+                    if self.vel_y >= 0:
+                        self.vel_y = 0
+                        self.in_air = False 
+                        dy = tile[1].top - self.rect.bottom 
 
         if pygame.sprite.spritecollide(self, water_group, False):
             self.health = 0
@@ -251,7 +251,7 @@ class Character(pygame.sprite.Sprite):
                     self.ammo -= 1
                     return bullet
             
-    def ai(self, player, world, SCREEN_SCROLL, bg_scroll, water_group, exit_group, control_glitch, direction_glitch,  gravity_glitch):
+    def ai(self, player, world, SCREEN_SCROLL, bg_scroll, water_group, exit_group, control_glitch, direction_glitch,  gravity_glitch, teleport_glitch):
         if self.alive and player.alive:
             if self.idling == False and random.randint(1, 50) == 5:
                 self.idling= True
@@ -273,7 +273,7 @@ class Character(pygame.sprite.Sprite):
                     ai_moving_right = False 
                 
                 ai_moving_left = not ai_moving_right
-                self.move(ai_moving_left, ai_moving_right, world, bg_scroll, water_group, exit_group, control_glitch,  gravity_glitch)
+                self.move(ai_moving_left, ai_moving_right, world, bg_scroll, water_group, exit_group, control_glitch,  gravity_glitch, teleport_glitch)
                 self.update_action(1)
                 self.move_counter += 1
 

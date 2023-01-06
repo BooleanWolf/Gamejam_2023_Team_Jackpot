@@ -107,11 +107,26 @@ GLITCH_LIST = {
     'gravity_glitch': False 
 }
 
+CUSTOM_GLITCH = {
+    'teleport' : False,
+    'wallbang' : False
+}
+
 glitch_happening = "No Glitch"
 glitch_counter = 0
 
+PRESSED_GLITCHED_BUTTON = {
+    'teleport' : False,
+    'wallbang' : False
+}
+custom_glitch = "NO GLITCH"
+CUSTOM_GLITCH_TIMER = 0
+TELEPORT_NUM = 3
+
+
 ######### LEVEL TIMER #################################################
 GLITCH_CLOCK = 360
+
 
 run = True 
 while run:
@@ -157,7 +172,7 @@ while run:
         #Enemy
         for enemy in enemy_group:
             healthbar.draw_enemy(enemy.health, screen, enemy)
-            bullet = enemy.ai(player, world, SCREEN_SCROLL, BG_SCROLL, water_group, exit_group, GLITCH_LIST['control_glitch'], GLITCH_LIST['direction_glitch'], GLITCH_LIST['gravity_glitch'])
+            bullet = enemy.ai(player, world, SCREEN_SCROLL, BG_SCROLL, water_group, exit_group, GLITCH_LIST['control_glitch'], GLITCH_LIST['direction_glitch'], GLITCH_LIST['gravity_glitch'], CUSTOM_GLITCH['teleport'])
             if bullet:
                 bullet_group.add(bullet)
             enemy.draw(screen)
@@ -169,7 +184,7 @@ while run:
         player.update()
 
         #Bullet
-        bullet_group.update(player, enemy_group, bullet_group, world, SCREEN_SCROLL)
+        bullet_group.update(player, enemy_group, bullet_group, world, SCREEN_SCROLL, CUSTOM_GLITCH['wallbang'])
         bullet_group.draw(screen)
     
 
@@ -184,14 +199,13 @@ while run:
         explosion_group.update(SCREEN_SCROLL)
         explosion_group.draw(screen)
 
-        ### Glitch
-        glitch_action = scene.ingame_ui(GLITCH_CLOCK // FPS, glitch_happening)
-
-        ########################## GLITCH VALUES ####################################
+    
+    ########################## GLITCH VALUES ####################################
         glitch_types = list(GLITCH_LIST.keys())
     
-        #################### CONTROLLING GLITCH ########################################
-
+    
+    #################### CONTROLLING GLITCH ########################################
+        next_glitch = glitch_types[glitch_counter]
         if GLITCH_CLOCK == 0:
             GLITCH_LIST = {
                 'control_glitch': False, 
@@ -208,7 +222,34 @@ while run:
         GLITCH_CLOCK -= 1
 
         ################# GLITCH BUTTON ##############################################
+        
 
+        scene.ingame_ui(GLITCH_CLOCK // FPS, glitch_happening, next_glitch)
+        glitch_action = scene.ingame_ui_for_custom(custom_glitch, CUSTOM_GLITCH_TIMER // FPS, PRESSED_GLITCHED_BUTTON['teleport'], PRESSED_GLITCHED_BUTTON['wallbang'])
+
+        if glitch_action == 1 and CUSTOM_GLITCH_TIMER<=0:
+            TELEPORT_NUM -= 1
+            CUSTOM_GLITCH['teleport'] = True
+            if TELEPORT_NUM<=0:
+                PRESSED_GLITCHED_BUTTON['teleport'] = True 
+            CUSTOM_GLITCH['wallbang'] = False  
+            custom_glitch = "TELEPORT"
+            CUSTOM_GLITCH_TIMER = 5*FPS
+           
+        elif glitch_action == 2 and CUSTOM_GLITCH_TIMER<=0:
+            CUSTOM_GLITCH['wallbang'] = True 
+            PRESSED_GLITCHED_BUTTON['wallbang'] = True 
+            CUSTOM_GLITCH['teleport'] = False  
+            custom_glitch = "WALL-BANG"
+            CUSTOM_GLITCH_TIMER = 8*FPS
+        
+        if CUSTOM_GLITCH_TIMER == 0:
+            CUSTOM_GLITCH['teleport'] = False
+            CUSTOM_GLITCH['wallbang'] = False
+            custom_glitch = "NO GLITCH"
+
+        if CUSTOM_GLITCH_TIMER>0:
+            CUSTOM_GLITCH_TIMER -= 1
         
          
 
@@ -231,7 +272,7 @@ while run:
             else:
                 player.update_action(0)
 
-            SCREEN_SCROLL, level_complete = player.move(moving_left, moving_right, world, BG_SCROLL, water_group, exit_group, GLITCH_LIST['control_glitch'], GLITCH_LIST['gravity_glitch'])
+            SCREEN_SCROLL, level_complete = player.move(moving_left, moving_right, world, BG_SCROLL, water_group, exit_group, GLITCH_LIST['control_glitch'], GLITCH_LIST['gravity_glitch'], CUSTOM_GLITCH['teleport'])
             BG_SCROLL -= SCREEN_SCROLL
 
             if level_complete:
@@ -259,6 +300,18 @@ while run:
                 }
                 glitch_happening = "No Glitch"
                 glitch_counter = 0
+
+                PRESSED_GLITCHED_BUTTON = {
+                    'teleport' : False,
+                    'wallbang' : False
+                }
+                custom_glitch = "NO GLITCH"
+                CUSTOM_GLITCH_TIMER = 0
+                CUSTOM_GLITCH = {
+                    'teleport' : False,
+                    'wallbang' : False
+                }
+
                 
 
         else:
@@ -288,6 +341,17 @@ while run:
                 }
                 glitch_happening = "No Glitch"
                 glitch_counter = 0
+                
+                PRESSED_GLITCHED_BUTTON = {
+                    'teleport' : False,
+                    'wallbang' : False
+                }
+                custom_glitch = "NO GLITCH"
+                CUSTOM_GLITCH_TIMER = 0
+                CUSTOM_GLITCH = {
+                    'teleport' : False,
+                    'wallbang' : False
+                }
                             
 
     #Events

@@ -25,7 +25,6 @@ class Background:
         for i in range(9):
             self.screen.blit(bg_img, (width * i - bg_scroll, 0))
        
-
     
 class HealthBar:
     def __init__(self, x, y, health, max_health):

@@ -16,7 +16,7 @@ class Bullet(pygame.sprite.Sprite):
         self.direction = direction
         self.not_glitch = not_glitch
     
-    def update(self, player, enemy_group, bullet_group, world, SCREEN_SCROLL):
+    def update(self, player, enemy_group, bullet_group, world, SCREEN_SCROLL, wallbang_glitch):
       
         self.rect.x += (self.not_glitch * self.direction * self.speed) + SCREEN_SCROLL
 
@@ -24,10 +24,10 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
         
         # Glitch 2 : Wall Bang - Bullets will go through the wall (Remove the next three lines)
-
-        for tile in world.obstacle_list:
-            if tile[1].colliderect(self.rect):
-                self.kill()
+        if not wallbang_glitch:
+            for tile in world.obstacle_list:
+                if tile[1].colliderect(self.rect):
+                    self.kill()
 
         
         if pygame.sprite.spritecollide(player, bullet_group, False):
