@@ -11,21 +11,41 @@ ITEM_BOX_GROUP =  pygame.sprite.Group()
 DECORATION_GROUP = pygame.sprite.Group()
 EXIT_GROUP = pygame.sprite.Group()
 WATER_GROUP = pygame.sprite.Group()
+MONEY_GROUP = pygame.sprite.Group()
 
-WORLD_DATA = []
-for row in range(ROWS):
-    r = [-1] * COLS 
-    WORLD_DATA.append(r)
+# WORLD_DATA = []
+# for row in range(ROWS):
+#     r = [-1] * COLS 
+#     WORLD_DATA.append(r)
 
-with open(f'level{LEVEL}_data.csv', newline='') as csvfile:
-    reader = csv.reader(csvfile, delimiter=',')
-    for x, row in enumerate(reader):
-        for y, tile in enumerate(row):
-            WORLD_DATA[x][y] = int(tile)
+with open("local_variable.json", "r") as openfile:
+    json_obj = json.load(openfile)
+    print(json_obj)
+
+# LEVEL = json_obj["Level"]
+# with open(f'level{LEVEL}_data.csv', newline='') as csvfile:
+#     reader = csv.reader(csvfile, delimiter=',')
+#     for x, row in enumerate(reader):
+#         for y, tile in enumerate(row):
+#             WORLD_DATA[x][y] = int(tile)
 
 class World:
     def __init__(self):
         self.obstacle_list = []
+
+    def get_world_data(self, level):
+        self.WORLD_DATA = []
+        for row in range(ROWS):
+            r = [-1] * COLS 
+            self.WORLD_DATA.append(r)
+        self.level = level
+        with open(f'./Levels/level{self.level}_data.csv', newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=',')
+            for x, row in enumerate(reader):
+                for y, tile in enumerate(row):
+                    self.WORLD_DATA[x][y] = int(tile)
+    
+        return self.WORLD_DATA 
 
     def process_delta(self, data):
 
@@ -40,7 +60,7 @@ class World:
                     img_rect.x = x * TILE_SIZE
                     img_rect.y = y * TILE_SIZE
                     tile_data = (img, img_rect)
-                    if tile >= 0 and tile <= 8:
+                    if (tile >= 0 and tile <= 8) or tile == 21:
                         self.obstacle_list.append(tile_data)
                     elif tile >= 9 and tile <= 10:
                         water = Water(img, x * TILE_SIZE, y * TILE_SIZE)
@@ -49,10 +69,10 @@ class World:
                         decoration = Decoration(img, x * TILE_SIZE, y * TILE_SIZE)
                         DECORATION_GROUP.add(decoration)
                     elif tile == 15:
-                        player = Character(x = x * TILE_SIZE, y = y * TILE_SIZE, char_type="Player",type = PLAYER_TYPE, scale= 0.2,speed= 5, ammo=5, grenades=10)
-                        healthbar = HealthBar(10, 10, player.health, player.max_health)
+                        player = Character(x = x * TILE_SIZE, y = y * TILE_SIZE, char_type="Player",type = PLAYER_TYPE, scale= 0.2,speed= 5, ammo=25, grenades=10)
+                        healthbar = HealthBar(55, 20, player.health, player.max_health)
                     elif tile == 16:
-                        enemy = Character(x = x * TILE_SIZE, y = y * TILE_SIZE, char_type="Enemy", type="CuteBorg", scale=0.25, speed=3, ammo=5, grenades=0)
+                        enemy = Character(x = x * TILE_SIZE, y = y * TILE_SIZE, char_type="Enemy", type="CuteBorg", scale=0.25, speed=3, ammo=100, grenades=0)
                         ENEMY_GROUP.add(enemy)
                     elif tile == 17:
                         item_box = ItemBox(x * TILE_SIZE, y * TILE_SIZE, 'AMMO')
@@ -66,6 +86,9 @@ class World:
                     elif tile == 20: # Exit 
                         exit = Exit(img, x * TILE_SIZE, y * TILE_SIZE)
                         EXIT_GROUP.add(exit)
+                    elif tile == 22:
+                        money = MoneyBox(x*TILE_SIZE, y*TILE_SIZE)
+                        MONEY_GROUP.add(money)
         return player, healthbar
     
     def draw(self, SCREEN_SCROLL):
@@ -103,3 +126,4 @@ class Exit(pygame.sprite.Sprite):
 
     def update(self, SCREEN_SCROLL):
         self.rect.x += SCREEN_SCROLL
+

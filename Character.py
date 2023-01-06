@@ -112,6 +112,10 @@ class Character(pygame.sprite.Sprite):
 
         self.width = self.img.get_width()
         self.height = self.img.get_height()
+        
+        # Pointing System
+        self.score = 0
+        self.level_score = 0
 
     
     def update(self):
@@ -198,8 +202,10 @@ class Character(pygame.sprite.Sprite):
             self.health = 0
         
         level_complete = False 
-        if pygame.sprite.spritecollide(self, exit_group, False):
+        if pygame.sprite.spritecollide(self, exit_group, False) and self.level_score >= NEXT_LEVEL_PASS:
             level_complete = True 
+        
+        
 
 
         if self.rect.bottom > SCREEN_HEIGHT:

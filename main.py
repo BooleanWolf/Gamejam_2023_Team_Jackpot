@@ -25,8 +25,9 @@ clock = pygame.time.Clock()
 
 ################################################## SCENE INITIALIZATION ###############################################
 
+play = False 
 game_start = False 
-Level_Select = False 
+how_to_Scene = False 
 
 #################################################### GAME VARIABLES ##################################################
 bullet_group = pygame.sprite.Group()
@@ -37,7 +38,8 @@ item_box_group =  ITEM_BOX_GROUP
 decoration_group = DECORATION_GROUP
 water_group = WATER_GROUP
 exit_group = EXIT_GROUP
-
+money_group = MONEY_GROUP
+explosion_group = EXPLOSION_GROUP
 ################################################## INFILE FUNCTION ###################################################
 
 def draw_text(text, font, text_col, x, y):
@@ -53,7 +55,8 @@ def reset_level():
     decoration_group.empty()
     water_group.empty()
     exit_group.empty()
-
+    money_group.empty()
+    
     DATA = []
     for row in range(ROWS):
         r = [-1] * COLS 
@@ -65,24 +68,27 @@ def reset_level():
 
 variables = {
     "PLAYER_TYPE" : "Cyborg",
-    "High Score" : 0
+    "High Score" : 0,
+    "Level" : 0
 }
 
-json_obj = json.dumps(variables, indent=4)
 
-with open("local_variable.json", "w") as outfile:
-    outfile.write(json_obj)
+
+def write_json(dik = variables):
+    json_obj = json.dumps(dik, indent=4)
+    with open("local_variable.json", "w") as outfile:
+        outfile.write(json_obj)
+
 
 ################################################## Player Action #####################################################
 moving_left = moving_right = shoot = grenade = False
 grenade_thrown = False 
 
-
-
 ############################################# Instances  #############################################################
 
 bg = Background(screen=screen)
 world = World()
+WORLD_DATA = world.get_world_data(0)
 player, healthbar = world.process_delta(WORLD_DATA)
 scene = Scene(screen)
 
@@ -125,36 +131,112 @@ TELEPORT_NUM = 3
 
 
 ######### LEVEL TIMER #################################################
-GLITCH_CLOCK = 360
+GLITCH_CLOCK = 420
 
+############################### GAME TEMPORARY LAYOUTS ##########################################
+SHOW_COLLECT_MONEY = False 
 
 run = True 
 while run:
     # Settings
     clock.tick(FPS)
 
-    if game_start == False:
+
+    if game_start == False and not how_to_Scene and not play:
         action = scene.home_screen()
         if action == 1:
             game_start = True 
         elif action == 2:
             run = False 
-    else:
+        elif action == 3:
+            how_to_Scene = True 
+    
+    if how_to_Scene and not game_start and not play:
+        action = scene.how_to_play()
+        if action == 1:
+            game_start = False 
+            Level_Select = False 
+            how_to_Scene = False 
+
+
+
+
+    if game_start and not play and not how_to_Scene:
+        level = scene.select_level()
+        if level:
+            play = True 
+            game_start = False 
+            how_to_Scene = False
+
+
+            ### NEW LEVEL ####
+            LEVEL += 0
+
+            variables['Level'] = LEVEL
+            write_json(variables)
+
+            BG_SCROLL = 0
+            world_data = reset_level()
+            if LEVEL <= MAX_LEVELS:
+                with open(f'./Levels/level{LEVEL}_data.csv', newline='') as csvfile:
+                    reader = csv.reader(csvfile, delimiter=',')
+                    for x, row in enumerate(reader):
+                        for y, tile in enumerate(row):
+                            world_data[x][y] = int(tile)
+                    world = World()
+                    player, healthbar = world.process_delta(world_data)
+            else:
+                pass # ALl Level Complete
+            wall_bang_glitch = False 
+            wet_glitch = False 
+            teleport_glitch = False 
+            GLITCH_CLOCK = 360
+
+            # Timer Glitch
+            GLITCH_LIST = {
+                'control_glitch': False, 
+                'direction_glitch': False, 
+                'gravity_glitch': False 
+            }
+            glitch_happening = "No Glitch"
+            glitch_counter = 0
+
+            PRESSED_GLITCHED_BUTTON = {
+                'teleport' : False,
+                'wallbang' : False
+            }
+            custom_glitch = "NO GLITCH"
+            CUSTOM_GLITCH_TIMER = 0
+            CUSTOM_GLITCH = {
+                'teleport' : False,
+                'wallbang' : False
+            }
+
+            player.score += player.level_score
+            TELEPORT_NUM = 3
+            ### NEW LEVEL ### 
+
+         
+
+    if play and not how_to_Scene and not game_start:
         #Background
         bg.draw_img_bg(bg_image, BG_SCROLL)
 
         world.draw(SCREEN_SCROLL)
-
+        
+        ############################# UI ########################################################################
         healthbar.draw_player(player.health, screen)
         # Text
-        draw_text(f"Ammo: {player.ammo}", FONT, RED, 100, 35)
-        draw_text(f"Grenades: {player.grenades}", FONT, RED, 100,55)
-        draw_text(f"Health: {player.health}", FONT, RED, 100, 75)
+        scene.health_and_other_sheets(player)
+        # draw_text(f"Ammo: {player.ammo}", FONT, RED, 100, 35)
+        # draw_text(f"Grenades: {player.grenades}", FONT, RED, 100,55)
+        # draw_text(f"Health: {player.health}", FONT, RED, 100, 75)
 
         # Visualizing ammo and grenades
 
-        for i in range(player.grenades):
-            screen.blit(grenade_img, (135 + (i*20), 40))
+        # for i in range(player.grenades):
+        #     screen.blit(grenade_img, (135 + (i*20), 40))
+
 
         # Items Update
         item_box_group.update(player, SCREEN_SCROLL)
@@ -168,6 +250,10 @@ while run:
 
         decoration_group.update(SCREEN_SCROLL)
         decoration_group.draw(screen)
+
+        money_group.update(SCREEN_SCROLL, player)
+        money_group.draw(screen)
+       
 
         #Enemy
         for enemy in enemy_group:
@@ -195,16 +281,17 @@ while run:
         
 
         #Animation
-        explosion_group = EXPLOSION_GROUP
+       
         explosion_group.update(SCREEN_SCROLL)
         explosion_group.draw(screen)
 
     
     ########################## GLITCH VALUES ####################################
         glitch_types = list(GLITCH_LIST.keys())
-    
+       
     
     #################### CONTROLLING GLITCH ########################################
+       
         next_glitch = glitch_types[glitch_counter]
         if GLITCH_CLOCK == 0:
             GLITCH_LIST = {
@@ -218,14 +305,18 @@ while run:
             if glitch_counter >= len(glitch_types):
                 glitch_counter = 0
         if GLITCH_CLOCK <= 0:
-            GLITCH_CLOCK = random.randint(6, 16)*FPS #TASK: eta ke random korte hobe 
+            GLITCH_CLOCK = 7*FPS #TASK: eta ke random korte hobe 
+            
         GLITCH_CLOCK -= 1
 
         ################# GLITCH BUTTON ##############################################
-        
+       
 
-        scene.ingame_ui(GLITCH_CLOCK // FPS, glitch_happening, next_glitch)
-        glitch_action = scene.ingame_ui_for_custom(custom_glitch, CUSTOM_GLITCH_TIMER // FPS, PRESSED_GLITCHED_BUTTON['teleport'], PRESSED_GLITCHED_BUTTON['wallbang'])
+        # scene.ingame_ui(GLITCH_CLOCK // FPS, glitch_happening, next_glitch)
+        scene.glitch_ui(GLITCH_LIST['control_glitch'], GLITCH_LIST['direction_glitch'], GLITCH_LIST['gravity_glitch'], GLITCH_CLOCK, next_glitch)
+        glitch_action = scene.custom_glitch_ui(custom_glitch, CUSTOM_GLITCH_TIMER // FPS, PRESSED_GLITCHED_BUTTON['teleport'], PRESSED_GLITCHED_BUTTON['wallbang'], TELEPORT_NUM)
+
+        scene.score_ui(player.level_score, player.score, SHOW_COLLECT_MONEY)
 
         if glitch_action == 1 and CUSTOM_GLITCH_TIMER<=0:
             TELEPORT_NUM -= 1
@@ -251,8 +342,13 @@ while run:
         if CUSTOM_GLITCH_TIMER>0:
             CUSTOM_GLITCH_TIMER -= 1
         
-         
+        if pygame.sprite.spritecollide(player, exit_group, False) and player.level_score < NEXT_LEVEL_PASS:
+            SHOW_COLLECT_MONEY = True 
+        else:
+            SHOW_COLLECT_MONEY = False 
 
+
+        
         # Shooring anmd moving 
         if player.alive:
 
@@ -276,11 +372,16 @@ while run:
             BG_SCROLL -= SCREEN_SCROLL
 
             if level_complete:
+                ### NEW LEVEL ####
                 LEVEL += 1
+
+                variables['Level'] = LEVEL
+                write_json(variables)
+
                 BG_SCROLL = 0
                 world_data = reset_level()
                 if LEVEL <= MAX_LEVELS:
-                    with open(f'level{LEVEL}_data.csv', newline='') as csvfile:
+                    with open(f'./Levels/level{LEVEL}_data.csv', newline='') as csvfile:
                         reader = csv.reader(csvfile, delimiter=',')
                         for x, row in enumerate(reader):
                             for y, tile in enumerate(row):
@@ -312,6 +413,9 @@ while run:
                     'wallbang' : False
                 }
 
+                player.score += player.level_score
+                TELEPORT_NUM = 3
+                ### NEW LEVEL ###
                 
 
         else:
@@ -320,7 +424,7 @@ while run:
                 BG_SCROLL = 0
                 world_data = reset_level()
 
-                with open(f'level{LEVEL}_data.csv', newline='') as csvfile:
+                with open(f'./Levels/level{LEVEL}_data.csv', newline='') as csvfile:
                     reader = csv.reader(csvfile, delimiter=',')
                     for x, row in enumerate(reader):
                         for y, tile in enumerate(row):
@@ -352,6 +456,10 @@ while run:
                     'teleport' : False,
                     'wallbang' : False
                 }
+
+                player.level_score = 0
+                TELEPORT_NUM = 3
+                
                             
 
     #Events

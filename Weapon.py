@@ -4,8 +4,6 @@ from Animation import *
 
 EXPLOSION_GROUP = pygame.sprite.Group()
 
-
-
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, direction, image, not_glitch):
         pygame.sprite.Sprite.__init__(self)
@@ -32,13 +30,14 @@ class Bullet(pygame.sprite.Sprite):
         
         if pygame.sprite.spritecollide(player, bullet_group, False):
             if player.alive:
-                player.health -= 10
+                player.health -= 20
                 print(f"Player Health: {player.health}")
                 self.kill()
         for enemy in enemy_group:
             if pygame.sprite.spritecollide(enemy, bullet_group, False):
                 if enemy.alive:
-                    enemy.health -= 50
+                    enemy.health -= 20
+                    player.level_score += 2
                     print(f"Enemy Health: {enemy.health}")
                     self.kill()
 
@@ -93,12 +92,13 @@ class Grenade(pygame.sprite.Sprite):
             EXPLOSION_GROUP.add(explosion)
         
             if abs(self.rect.centerx - player.rect.centerx) < TILE_SIZE * 2 and  abs(self.rect.centery - player.rect.centery) < TILE_SIZE * 2:
-                player.health -= 50
+                player.health -= 45
                 print(player.health)
             
             for enemy in enemy_group:
                 if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 2 and  abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 2:
-                    enemy.health -= 30
+                    enemy.health -= 45
+                    player.level_score += 5
                     print(enemy.health)
 
 

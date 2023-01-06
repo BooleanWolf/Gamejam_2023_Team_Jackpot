@@ -35,9 +35,9 @@ class HealthBar:
 
     def draw_player(self, health, screen):
         self.health = health 
-        pygame.draw.rect(screen, BLACK, (self.x - 2, self.y - 2, 154, 24))
-        pygame.draw.rect(screen, RED, (self.x, self.y, 150, 20))
-        pygame.draw.rect(screen, GREEN, (self.x, self.y, 150 * (self.health/self.max_health), 20))
+        pygame.draw.rect(screen, BLACK, (self.x - 2, self.y - 2, 164, 19))
+        pygame.draw.rect(screen, RED, (self.x, self.y, 160, 15))
+        pygame.draw.rect(screen, GREEN, (self.x, self.y, 160 * (self.health/self.max_health), 15))
     
     def draw_enemy(self, health, screen, enemy):
         self.health = health 
