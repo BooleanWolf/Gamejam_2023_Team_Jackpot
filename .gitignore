@@ -1,12 +1,12 @@
-# Created by https://www.toptal.com/developers/gitignore/api/venv,python
-# Edit at https://www.toptal.com/developers/gitignore?templates=venv,python
+# Created by https://www.toptal.com/developers/gitignore/api/python,venv
+# Edit at https://www.toptal.com/developers/gitignore?templates=python,venv
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-
+.VSCodeCounter/
 # C extensions
 *.so
 
@@ -180,4 +180,4 @@ poetry.toml
 pyvenv.cfg
 pip-selfcheck.json
 
-# End of https://www.toptal.com/developers/gitignore/api/venv,python
+# End of https://www.toptal.com/developers/gitignore/api/python,venv
