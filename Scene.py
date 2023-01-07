@@ -3,6 +3,7 @@ from ImageGraphics import *
 from Graphics import *
 import os
 import math
+from Audio import *
 
 play_button = Button(SCREEN_WIDTH//2 - 100, SCREEN_HEIGHT//2  -100, playButton_img, 0.3)
 exit_btn = Button(SCREEN_WIDTH//2 - 60, SCREEN_HEIGHT//2 + 280, exitbtn_img, 0.4)
@@ -15,6 +16,8 @@ wallbang_btn = Button(SCREEN_WIDTH - 70, 90, wallbang_btn_img, 0.5)
 how_to = Button(SCREEN_WIDTH//2 - 60, SCREEN_HEIGHT//2 + 200, how_to_btn, 0.4)
 
 backBtn = Button(SCREEN_WIDTH - 110, SCREEN_HEIGHT - 80, back_btn, 0.3)
+
+
 
 
 ######### LEVEL BUTTONS #####################################################################
@@ -41,6 +44,12 @@ level13 = Button(760, 450, level_btns[12], 0.4)
 level14 = Button(910, 450, level_btns[13], 0.4)
 level15 = Button(1060, 450, level_btns[14], 0.4)
 
+reset_btn = Button(SCREEN_WIDTH - 200, 30, reset_img, 1)
+
+with open("local_variable.json", "r") as openfile:
+    json_obj = json.load(openfile)
+
+high_score = json_obj['High Score']
 class Scene:
     def __init__(self, screen) -> None:
         self.screen = screen
@@ -62,6 +71,8 @@ class Scene:
     
     def home_screen(self):
         self.screen.blit(homeScreen_img, (0, 0))
+        high = self.draw_text(f"High Score: {high_score}", SCREEN_WIDTH // 2, SCREEN_HEIGHT - 50, 25, (255,255,255))
+        self.screen.blit(high[0], high[1])
         if play_button.draw(self.screen):
             return 1 
         if exit_btn.draw(self.screen):
@@ -70,6 +81,7 @@ class Scene:
             return 3
     
     def restart_screen(self):
+        self.screen.blit(dead_img, (SCREEN_WIDTH // 2 - 95, SCREEN_HEIGHT // 2 - 300))
         if restart_btn.draw(self.screen):
             return 1
     
@@ -105,6 +117,11 @@ class Scene:
         bullet_number = self.draw_number(f"{player.ammo}", 70, 68, 30)
         self.screen.blit( bullet_number[0],  bullet_number[1])
 
+        if reset_btn.draw(self.screen):
+            return 1
+
+        
+
         for i in range(0, player.grenades):
             grg = transform_image(grenade_img, 1.2)
             screen.blit(grg, (15 + (i*20), 102))
@@ -119,22 +136,38 @@ class Scene:
         
         if next_glitch == 'gravity_glitch':
             nxtg = "GRAVITY"
+
         
         if next_glitch == 'direction_glitch':
             nxtg = "GRENADE & BULLET"
 
         if next_glitch == 'control_glitch':
             nxtg = "CONTROL"
+        
+        txt = self.draw_text(f"Shooting can cause damage you too.", 5*TILE_SIZE, SCREEN_HEIGHT - 3*TILE_SIZE + 75, 20, (255,255,255))
+        self.screen.blit(txt[0], txt[1])
 
         if control:
             self.screen.blit(controlG_img, (SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 145))
-            self.screen.blit(control_in, (10, SCREEN_HEIGHT - 3*TILE_SIZE + 10))
+            # self.screen.blit(control_in, (10, SCREEN_HEIGHT - 3*TILE_SIZE + 10))
+            txt = self.draw_text(f"Oops. Your key isn't supposed to do that.", SCREEN_WIDTH // 2, SCREEN_HEIGHT - 3*TILE_SIZE - 20, 20, (255,255,255))
+            self.screen.blit(txt[0], txt[1])
+            txt = self.draw_text(f"'A' for Right and 'D' for Left",  5*TILE_SIZE, SCREEN_HEIGHT - 3*TILE_SIZE + 50, 20, (255,255,255))
+            self.screen.blit(txt[0], txt[1])
         elif direction:
             self.screen.blit(directionG_img, (SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 145))
-            self.screen.blit(direct_in, (10, SCREEN_HEIGHT - 3*TILE_SIZE + 10))
+            # self.screen.blit(direct_in, (10, SCREEN_HEIGHT - 3*TILE_SIZE + 10))
+            txt = self.draw_text(f"Oops. Bullets and Grenades aren't supposed to do that.", SCREEN_WIDTH // 2, SCREEN_HEIGHT - 3*TILE_SIZE - 20, 20, (255,255,255))
+            self.screen.blit(txt[0], txt[1])
+            txt = self.draw_text(f"You will shoot/throw from your back", 5*TILE_SIZE, SCREEN_HEIGHT - 3*TILE_SIZE + 50, 20, (255,255,255))
+            self.screen.blit(txt[0], txt[1])
         elif gravity:
             self.screen.blit(gravityG_img, (SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 145))
-            self.screen.blit(gravity_in, (10, SCREEN_HEIGHT - 3*TILE_SIZE + 10))
+            # self.screen.blit(gravity_in, (10, SCREEN_HEIGHT - 3*TILE_SIZE + 10))
+            txt = self.draw_text(f"Oops. Gravity isn't supposed to do that.", SCREEN_WIDTH // 2, SCREEN_HEIGHT - 3*TILE_SIZE - 20, 20, (255,255,255))
+            self.screen.blit(txt[0], txt[1])
+            txt = self.draw_text(f"Press 'S' to stay low", 5*TILE_SIZE, SCREEN_HEIGHT - 3*TILE_SIZE + 50, 20, (255,255,255))
+            self.screen.blit(txt[0], txt[1])
         
         self.drawArc((255, 0, 0), (SCREEN_WIDTH // 2, SCREEN_HEIGHT - 50), 30, 10, 2*math.pi*(time_left/420))
         timer = self.draw_number(f"{time_left // FPS}", SCREEN_WIDTH // 2, SCREEN_HEIGHT - 50, 30)
@@ -227,6 +260,9 @@ class Scene:
             return 15
 
         pass
+    
+    def lastScene(self):
+        self.screen.blit(last_img, (0, 0)) 
             
 
        

@@ -1,6 +1,7 @@
 import pygame 
 from Settings import *
 from Animation import *
+from Audio import *
 
 EXPLOSION_GROUP = pygame.sprite.Group()
 
@@ -30,7 +31,9 @@ class Bullet(pygame.sprite.Sprite):
         
         if pygame.sprite.spritecollide(player, bullet_group, False):
             if player.alive:
-                player.health -= 20
+                getting_hit_fx.play()
+                player.health -= 5
+                
                 print(f"Player Health: {player.health}")
                 self.kill()
         for enemy in enemy_group:
@@ -46,8 +49,8 @@ class Grenade(pygame.sprite.Sprite):
     def __init__(self, x, y, direction, image):
         pygame.sprite.Sprite.__init__(self)
         self.timer = 100
-        self.velocity_y = -11
-        self.speed = 7
+        self.velocity_y = -8
+        self.speed = 5
         self.image = image 
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -88,11 +91,14 @@ class Grenade(pygame.sprite.Sprite):
         a = 0
         if self.timer <= 0:
             self.kill()
+            grenade_fx.play()
             explosion = Explosion(self.rect.x, self.rect.y)
             EXPLOSION_GROUP.add(explosion)
         
             if abs(self.rect.centerx - player.rect.centerx) < TILE_SIZE * 2 and  abs(self.rect.centery - player.rect.centery) < TILE_SIZE * 2:
+                getting_hit_fx.play()
                 player.health -= 45
+                
                 print(player.health)
             
             for enemy in enemy_group:

@@ -87,3 +87,11 @@ for i in range(1, 26):
     level0_btn = pygame.image.load(f'./assets/LevelSelectScene/{i}.jpeg').convert_alpha()
     level0_btn = pygame.transform.scale(level0_btn, (300, 300))
     level_btns.append(level0_btn)
+
+
+dead_img = pygame.image.load('./assets/Scenes/death.png').convert_alpha()
+last_img = pygame.image.load('./assets/Scenes/last.png').convert_alpha()
+last_img = pygame.transform.scale(last_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+reset_img = pygame.image.load('./assets/Buttons/reset.png').convert_alpha()
+reset_img = transform_image(reset_img, 0.5)

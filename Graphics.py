@@ -20,7 +20,7 @@ class Background:
         self.screen.fill(self.colour)
     
     def draw_img_bg(self, bg_img, bg_scroll):
-        self.screen.fill(self.colour)
+        self.screen.fill((173, 216, 230))
         width = bg_img.get_width()
         for i in range(9):
             self.screen.blit(bg_img, (width * i - bg_scroll, 0))

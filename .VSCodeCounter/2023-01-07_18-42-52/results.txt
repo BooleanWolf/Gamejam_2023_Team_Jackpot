@@ -1,0 +1,44 @@
+Date : 2023-01-07 18:42:52
+Directory : f:\Game 2D\GameJam2023
+Total : 16 files,  1360 codes, 123 comments, 465 blanks, all 1948 lines
+
+Languages
++------------------+------------+------------+------------+------------+------------+
+| language         | files      | code       | comment    | blank      | total      |
++------------------+------------+------------+------------+------------+------------+
+| Python           |         14 |      1,350 |        123 |        464 |      1,937 |
+| pip requirements |          1 |          5 |          0 |          1 |          6 |
+| JSON             |          1 |          5 |          0 |          0 |          5 |
++------------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                   | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                      |         16 |      1,360 |        123 |        465 |      1,948 |
+| . (Files)                                              |         14 |      1,186 |         81 |        411 |      1,678 |
+| LevelEditor                                            |          2 |        174 |         42 |         54 |        270 |
++--------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------+------------------+------------+------------+------------+------------+
+| filename                                               | language         | code       | comment    | blank      | total      |
++--------------------------------------------------------+------------------+------------+------------+------------+------------+
+| f:\Game 2D\GameJam2023\Animation.py                    | Python           |         28 |          0 |         12 |         40 |
+| f:\Game 2D\GameJam2023\Audio.py                        | Python           |         14 |          0 |          4 |         18 |
+| f:\Game 2D\GameJam2023\Character.py                    | Python           |        249 |          6 |         84 |        339 |
+| f:\Game 2D\GameJam2023\Graphics.py                     | Python           |         54 |          0 |         18 |         72 |
+| f:\Game 2D\GameJam2023\ImageGraphics.py                | Python           |         57 |          5 |         31 |         93 |
+| f:\Game 2D\GameJam2023\Instances.py                    | Python           |          2 |          0 |          0 |          2 |
+| f:\Game 2D\GameJam2023\Items.py                        | Python           |         46 |          1 |         20 |         67 |
+| f:\Game 2D\GameJam2023\LevelEditor\button.py           | Python           |         20 |          4 |          7 |         31 |
+| f:\Game 2D\GameJam2023\LevelEditor\level_editor_tut.py | Python           |        154 |         38 |         47 |        239 |
+| f:\Game 2D\GameJam2023\Scene.py                        | Python           |        178 |          8 |         56 |        242 |
+| f:\Game 2D\GameJam2023\Settings.py                     | Python           |         19 |          5 |         17 |         41 |
+| f:\Game 2D\GameJam2023\Weapon.py                       | Python           |         82 |          1 |         28 |        111 |
+| f:\Game 2D\GameJam2023\World.py                        | Python           |         99 |         10 |         21 |        130 |
+| f:\Game 2D\GameJam2023\local_variable.json             | JSON             |          5 |          0 |          0 |          5 |
+| f:\Game 2D\GameJam2023\main.py                         | Python           |        348 |         45 |        119 |        512 |
+| f:\Game 2D\GameJam2023\requirements.txt                | pip requirements |          5 |          0 |          1 |          6 |
+| Total                                                  |                  |      1,360 |        123 |        465 |      1,948 |
++--------------------------------------------------------+------------------+------------+------------+------------+------------+

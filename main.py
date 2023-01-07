@@ -11,9 +11,13 @@ from World import *
 from Instances import *
 from Scene import *
 import random
+from pygame import mixer
+from Audio import *
 
+mixer.init()
 pygame.init()
 
+pygame.mixer.music.play(-1, 0.0, 5000)
 
 SCREEN_SCROLL = 0
 BG_SCROLL = 0
@@ -28,6 +32,7 @@ clock = pygame.time.Clock()
 play = False 
 game_start = False 
 how_to_Scene = False 
+last_page = False 
 
 #################################################### GAME VARIABLES ##################################################
 bullet_group = pygame.sprite.Group()
@@ -69,7 +74,7 @@ def reset_level():
 variables = {
     "PLAYER_TYPE" : "Cyborg",
     "High Score" : 0,
-    "Level" : 0
+    "Level" : 0,
 }
 
 
@@ -88,7 +93,7 @@ grenade_thrown = False
 
 bg = Background(screen=screen)
 world = World()
-WORLD_DATA = world.get_world_data(0)
+WORLD_DATA = world.get_world_data(LEVEL)
 player, healthbar = world.process_delta(WORLD_DATA)
 scene = Scene(screen)
 
@@ -131,7 +136,7 @@ TELEPORT_NUM = 3
 
 
 ######### LEVEL TIMER #################################################
-GLITCH_CLOCK = 420
+GLITCH_CLOCK = 480
 
 ############################### GAME TEMPORARY LAYOUTS ##########################################
 SHOW_COLLECT_MONEY = False 
@@ -141,8 +146,11 @@ while run:
     # Settings
     clock.tick(FPS)
 
+    if last_page and not play and not game_start and not how_to_Scene:
+        scene.lastScene()
 
-    if game_start == False and not how_to_Scene and not play:
+
+    if game_start == False and not how_to_Scene and not play and not last_page:
         action = scene.home_screen()
         if action == 1:
             game_start = True 
@@ -151,7 +159,7 @@ while run:
         elif action == 3:
             how_to_Scene = True 
     
-    if how_to_Scene and not game_start and not play:
+    if how_to_Scene and not game_start and not play and not last_page:
         action = scene.how_to_play()
         if action == 1:
             game_start = False 
@@ -161,7 +169,7 @@ while run:
 
 
 
-    if game_start and not play and not how_to_Scene:
+    if game_start and not play and not how_to_Scene and not last_page:
         level = scene.select_level()
         if level:
             play = True 
@@ -170,7 +178,7 @@ while run:
 
 
             ### NEW LEVEL ####
-            LEVEL += 0
+            LEVEL += (level - 1)
 
             variables['Level'] = LEVEL
             write_json(variables)
@@ -190,7 +198,7 @@ while run:
             wall_bang_glitch = False 
             wet_glitch = False 
             teleport_glitch = False 
-            GLITCH_CLOCK = 360
+            GLITCH_CLOCK = 480
 
             # Timer Glitch
             GLITCH_LIST = {
@@ -227,7 +235,10 @@ while run:
         ############################# UI ########################################################################
         healthbar.draw_player(player.health, screen)
         # Text
-        scene.health_and_other_sheets(player)
+        ac = scene.health_and_other_sheets(player)
+
+        if ac == 1:
+            player.alive = False 
         # draw_text(f"Ammo: {player.ammo}", FONT, RED, 100, 35)
         # draw_text(f"Grenades: {player.grenades}", FONT, RED, 100,55)
         # draw_text(f"Health: {player.health}", FONT, RED, 100, 75)
@@ -304,6 +315,7 @@ while run:
             glitch_counter += 1
             if glitch_counter >= len(glitch_types):
                 glitch_counter = 0
+            glitch_change.play()
         if GLITCH_CLOCK <= 0:
             GLITCH_CLOCK = 7*FPS #TASK: eta ke random korte hobe 
             
@@ -319,6 +331,7 @@ while run:
         scene.score_ui(player.level_score, player.score, SHOW_COLLECT_MONEY)
 
         if glitch_action == 1 and CUSTOM_GLITCH_TIMER<=0:
+            custom_glitch_music.play()
             TELEPORT_NUM -= 1
             CUSTOM_GLITCH['teleport'] = True
             if TELEPORT_NUM<=0:
@@ -328,6 +341,7 @@ while run:
             CUSTOM_GLITCH_TIMER = 5*FPS
            
         elif glitch_action == 2 and CUSTOM_GLITCH_TIMER<=0:
+            custom_glitch_music.play()
             CUSTOM_GLITCH['wallbang'] = True 
             PRESSED_GLITCHED_BUTTON['wallbang'] = True 
             CUSTOM_GLITCH['teleport'] = False  
@@ -372,10 +386,14 @@ while run:
             BG_SCROLL -= SCREEN_SCROLL
 
             if level_complete:
+                level_change_music.play()
                 ### NEW LEVEL ####
                 LEVEL += 1
 
                 variables['Level'] = LEVEL
+                if player.level_score > variables['High Score']:
+                    variables['High Score'] = player.level_score
+
                 write_json(variables)
 
                 BG_SCROLL = 0
@@ -388,10 +406,18 @@ while run:
                                 world_data[x][y] = int(tile)
                         world = World()
                         player, healthbar = world.process_delta(world_data)
+                else:
+                    play = False
+                    game_start = False 
+                    how_to_Scene = False 
+                    last_page = True 
+                    
+
                 wall_bang_glitch = False 
                 wet_glitch = False 
                 teleport_glitch = False 
-                GLITCH_CLOCK = 360
+                GLITCH_CLOCK = 480
+
 
                 # Timer Glitch
                 GLITCH_LIST = {
@@ -416,6 +442,8 @@ while run:
                 player.score += player.level_score
                 TELEPORT_NUM = 3
                 ### NEW LEVEL ###
+            # else:
+            #     scene.lastScene()
                 
 
         else:
@@ -435,7 +463,7 @@ while run:
                 wall_bang_glitch = False 
                 wet_glitch = False 
                 teleport_glitch = False 
-                GLITCH_CLOCK = 360
+                GLITCH_CLOCK = 480
 
                 # Timer Glitch
                 GLITCH_LIST = {
@@ -459,6 +487,8 @@ while run:
 
                 player.level_score = 0
                 TELEPORT_NUM = 3
+
+               
                 
                             
 
@@ -478,6 +508,7 @@ while run:
             if event.key == pygame.K_q:
                 grenade = True 
             if event.key == pygame.K_w and player.alive:
+                jump_fx.play()
                 player.jump = True 
 
             if event.key == pygame.K_s and player.alive and GLITCH_LIST['gravity_glitch']:

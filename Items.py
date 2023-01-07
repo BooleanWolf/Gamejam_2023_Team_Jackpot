@@ -22,7 +22,7 @@ class ItemBox(pygame.sprite.Sprite):
         self.rect.x += SCREEN_SCROLL
         if pygame.sprite.collide_rect(self, player):
             if self.item_type == "HEALTH":
-                player.health += 25
+                player.health += 40
                 if player.health > player.max_health:
                     player.health = player.max_health
             elif self.item_type == "AMMO":

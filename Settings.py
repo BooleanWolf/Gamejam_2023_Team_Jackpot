@@ -1,7 +1,7 @@
 import json
 
 
-MAX_LEVELS = 3
+MAX_LEVELS = 15
 
 ############################################################# Character ###################################################\
 with open("local_variable.json", "r") as openfile:
@@ -23,7 +23,7 @@ ROWS = 16
 COLS = 150
 
 
-LEVEL = 0
+LEVEL = 1
 
 
 

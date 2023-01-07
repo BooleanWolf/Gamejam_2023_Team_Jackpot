@@ -3,7 +3,7 @@ import pygame
 from Weapon import *
 from Settings import *
 import random
-
+from Audio import *
 import pygame
 
 class Character(pygame.sprite.Sprite):
@@ -219,7 +219,7 @@ class Character(pygame.sprite.Sprite):
             
             if self.rect.top + dy <= 0:
                 dy = 0
-                self.alive = False 
+                self.health -= 2
 
         
         self.rect.x += dx
@@ -233,7 +233,9 @@ class Character(pygame.sprite.Sprite):
         return SCREEN_SCROLL, level_complete
     
     def shoot(self, bullet_img, direction_glitch):
+        shot_fx.play()
         if self.shoot_cooldown == 0 and self.ammo > 0:
+            
             self.shoot_cooldown = 20
             
             if self.char_type == "Player" and direction_glitch:
@@ -286,7 +288,7 @@ class Character(pygame.sprite.Sprite):
                 self.vision.center = (self.rect.centerx + 75 * self.direction, self.rect.centery)
                
 
-                if self.move_counter > TILE_SIZE:
+                if self.move_counter > TILE_SIZE - 15:
                     self.direction *= -1
                     self.move_counter *= -1
             else:
