@@ -6,9 +6,8 @@
 
 ###1. (Easy way)
 
-Go to this link
-
-Download the application file and install the game in one click. It will install all the dependencies itself. 
+Go to this link https://drive.google.com/file/d/1fCfAie3jPeQ67hrQkRYJfZBSCZyX8sP1/view?usp=share_link 
+Download the application file and install the game. It will install all the dependencies itself. 
 
 After installation is done, head over to the installation folder and open the main.exe file to play. 
 
