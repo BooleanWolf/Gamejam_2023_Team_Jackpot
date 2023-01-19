@@ -22,6 +22,9 @@ b) In the folder, open the CMD and type
 
 *You need to have python and pip installed*
 
+In this case, if you are on ubuntu you will face an error. That is "./assets/TILES/22.png" not found. 
+To solve this issue, you need to rename the file 22.PNG to 22.png. Just decaptilize the file extension. 
+
 c) Open the main.exe file to play
 
 
